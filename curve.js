@@ -76,8 +76,9 @@ Array.prototype.diff = function (a) {
     });
 };
 
-function calculatePosition() {
-    return {x: getRandomInt(100, size.width - 100), y: getRandomInt(100, size.height - 100)};
+function calculatePosition(offset) {
+
+    return {x: getRandomInt(offset, size.width - offset), y: getRandomInt(offset, size.height - offset)};
 }
 
 function shuffle(array) {
@@ -156,9 +157,33 @@ function Game() {
         this.playerColors[this.potentialPlayerNames[i]] = this.colors[i];
     }
 
+    this.calculatePlayersPosWithDistance = function () {
+        var instance = this;
+
+        function setPos() {
+            var pos = calculatePosition(100);
+            for (var i = 0; i < instance.players.length; i++) {
+                if (!instance.players[i].position)
+                    continue;
+                var dist = Math.sqrt(Math.pow(instance.players[i].position.x - pos.x, 2) + Math.pow(instance.players[i].position.y - pos.y, 2));
+
+                if (dist < 50){
+                    console.log(true);
+                    return setPos();
+                }
+            }
+
+            return pos;
+        }
+
+        return setPos();
+
+    };
 
     this.setPlayer = function (playerName, leftKey, rightKey, actionKey, ki) {
-        this.players.push(new Player(playerName, rightKey, leftKey, actionKey, this.playerColors[playerName], ki));
+
+        var pos = this.calculatePlayersPosWithDistance();
+        this.players.push(new Player(playerName, rightKey, leftKey, actionKey, this.playerColors[playerName], pos, ki));
     };
 
 
@@ -383,7 +408,7 @@ function Game() {
 
             var extra = instance.generateExtra();
 
-            var position = calculatePosition();
+            var position = calculatePosition(20);
 
             var color;
 
@@ -628,21 +653,21 @@ function Game() {
 
                                             var index = getRandomInt(0, list.length - 1);
 
-                                            if (index === notThis)
+                                            if (index == notThis)
                                                 return getRandomIndex(list, notThis);
                                             return index;
                                         }
 
                                         var border = 1;
 
-                                        if (playersLeft.length % 2 !== 0)
+                                        if (playersLeft.length % 2 != 0)
                                             border = 0;
 
 
                                         while (playersLeft.length > border) {
 
                                             //odd number of players
-                                            if (playersLeft.length === 1) {
+                                            if (playersLeft.length == 1) {
                                                 var ind = 0;
                                                 for (var n = 0; n < tmpPlayers.length; n++)
                                                     if (tmpPlayers[n].name === playersLeft[0].name) {
@@ -685,9 +710,9 @@ function Game() {
                                             var i1 = null;
                                             var i2 = null;
                                             for (var a = 0; a < instance.players.length; a++) {
-                                                if (instance.players[a].name === playerToReverse1.name)
+                                                if (instance.players[a].name == playerToReverse1.name)
                                                     i1 = a;
-                                                else if (instance.players[a].name === playerToReverse2.name)
+                                                else if (instance.players[a].name ==playerToReverse2.name)
                                                     i2 = a;
                                             }
 
@@ -939,7 +964,10 @@ function Game() {
                                     instance.reset();
                                     instance.players = copiedPlayer;
                                     $.each(instance.players, function (index, value) {
-                                        value.reset();
+                                        value.position = null;
+                                    });
+                                    $.each(instance.players, function (index, value) {
+                                        value.reset(instance.calculatePlayersPosWithDistance());
                                     });
                                     instance.playInitials();
                                     return;
@@ -996,12 +1024,16 @@ function Game() {
         this.extraCtx.clearRect(0, 0, size.width, size.height);
         this.actionCtx.clearRect(0, 0, size.width, size.height);
 
-
         for (var i = 0; i < this.players.length; i++) {
-            var player = this.players[i];
-            player.reset();
-            this.ctx.clearRect(2, 2, size.width - 4, size.height - 4);
+            this.players[i].position = null;
         }
+
+        for (var j = 0; j < this.players.length; j++) {
+            var player = this.players[j];
+            player.reset(this.calculatePlayersPosWithDistance());
+        }
+        this.ctx.clearRect(2, 2, size.width - 4, size.height - 4);
+
 
     };
 
@@ -1161,7 +1193,7 @@ function Game() {
     };
 }
 
-function Player(name, rightKey, leftKey, actionKey, color, ki) {
+function Player(name, rightKey, leftKey, actionKey, color, pos, ki) {
 
     this.ki = ki;
     this.headColor = "#FFFF00";
@@ -1179,7 +1211,7 @@ function Player(name, rightKey, leftKey, actionKey, color, ki) {
     this.angle = getRandomInt(0, 360);
     this.alive = true;
     this.killed = false;
-    this.position = calculatePosition();
+    this.position = pos;
     this.nextPosition = this.position;
     this.checkingPositions = [this.position];
 
@@ -1367,10 +1399,10 @@ function Player(name, rightKey, leftKey, actionKey, color, ki) {
         return "Player: [weight: " + this.weight + "; speed: " + this.speed + "; alive: " + this.alive + "; ]"
     };
 
-    this.reset = function () {
+    this.reset = function (pos) {
         this.angle = getRandomInt(0, 360);
         this.alive = true;
-        this.position = calculatePosition();
+        this.position = pos;
         this.nextPosition = this.position;
         this.checkingPositions = [this.position];
         this.speed = 1.8;
@@ -1536,7 +1568,7 @@ function Player(name, rightKey, leftKey, actionKey, color, ki) {
     Beam.prototype.constructor = Beam;
     Beam.prototype.fire = function (args) {
 
-        args.player.position = calculatePosition();
+        args.player.position = calculatePosition(50);
     };
 
     Eraser = function () {
