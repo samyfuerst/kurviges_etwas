@@ -1,0 +1,343 @@
+body {
+    font-size: 16px;
+    font-family: sans-serif;
+    font-weight: bold;
+
+}
+
+#statistics {
+    float: left;
+    margin-right: 100px;
+    margin-left: 100px;
+    margin-top: 50px;
+}
+
+.player_label {
+    display: inline-block;
+    vertical-align: middle;
+    padding: 3px;
+    border-radius: 4px;
+    margin-right: 10px;
+    border: solid #FFF 2px;
+    width: 150px;
+    text-align: center;
+}
+
+#playground {
+    position: absolute;
+    z-index: 1;
+    background-color: #000000;
+}
+
+#upper_layer {
+    position: absolute;
+    z-index: 2;
+}
+
+#extra_layer {
+    position: absolute;
+    z-index: 3;
+}
+
+#border_layer {
+    position: absolute;
+    z-index: 4;
+}
+
+#action_layer {
+    position: absolute;
+    z-index: 5;
+}
+
+.key_input {
+    width: 28px;
+    height: 28px;
+    margin-left: 30px;
+    float: left;
+    color: white;
+    background-color: #202020;
+    border-radius: 14px;
+    display: flex;
+    justify-content: center; /* align horizontal */
+    align-items: center; /* align vertical */
+    border: solid 1px white;
+
+}
+
+.float_left {
+    float: left;
+}
+
+.relative {
+    position: relative;
+}
+
+.inline {
+    display: inline-block;
+}
+
+.player {
+    position: relative;
+    width: 100%;
+    height: 50px;
+    margin-bottom: 5px;
+    display: block;
+    padding-top: 20px;
+    padding-left: 20px;
+
+}
+
+.action {
+    height: 40px;
+    width: 40px;
+    border-radius: 20px;
+    margin-left: auto;
+    float: right;
+    background-color: rgba(100, 100, 100, 0.5);
+}
+
+#key_label {
+    color: #FFF;
+    display: none;
+    position: absolute;
+}
+
+#preparation {
+    margin-left: auto;
+    margin-right: auto;
+    display: table;
+
+}
+
+#headline {
+    text-align: center;
+    padding: 30px 0px;
+    font-size: 30px;
+    -webkit-animation: color-change 1s infinite;
+    -moz-animation: color-change 1s infinite;
+    -o-animation: color-change 1s infinite;
+    -ms-animation: color-change 1s infinite;
+    animation: color-change 1s infinite;
+}
+
+@-webkit-keyframes color-change {
+    0% {
+        color: red;
+    }
+    50% {
+        color: blue;
+    }
+    100% {
+        color: red;
+    }
+}
+
+@-moz-keyframes color-change {
+    0% {
+        color: red;
+    }
+    50% {
+        color: blue;
+    }
+    100% {
+        color: red;
+    }
+}
+
+@-ms-keyframes color-change {
+    0% {
+        color: red;
+    }
+    50% {
+        color: blue;
+    }
+    100% {
+        color: red;
+    }
+}
+
+@-o-keyframes color-change {
+    0% {
+        color: red;
+    }
+    50% {
+        color: blue;
+    }
+    100% {
+        color: red;
+    }
+}
+
+@keyframes color-change {
+    0% {
+        color: red;
+    }
+    50% {
+        color: blue;
+    }
+    100% {
+        color: red;
+    }
+}
+
+.mask {
+
+    border-radius: 10px;
+    cursor: pointer;
+    margin-bottom: 5px;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    background-color: rgba(150, 150, 150, 0.5);
+}
+
+#goal {
+    color: rgba(196, 196, 196, 1);
+    width: 100%;
+    text-align: center;
+    margin-bottom: 20px;
+
+}
+
+.player_points {
+    margin-left: 10px;
+}
+
+.game_button {
+    margin-top: 30px;
+    width: 100%;
+}
+
+#dialog_mask {
+    display: none;
+    width: 60%;
+    height: 550px;
+    background-color: rgba(100, 100, 100, 0.8);
+    z-index: 10;
+    top: 10%;
+    left: 20%;
+    position: absolute;
+    border-radius: 20px;
+    border: solid 2px white;
+
+}
+
+#close_dialog {
+    width: 30px;
+    height: 30px;
+    left: 100%;
+    top: 0;
+    margin-left: -15px;
+    margin-top: -15px;
+    position: relative;
+}
+
+#legend_container {
+    width: 600px;
+    margin-right: auto;
+    margin-left: auto;
+    text-align: center;
+
+
+}
+
+#close_dialog{
+   cursor: pointer;
+}
+
+
+.extra_image_display {
+    margin-right: 10px;
+}
+
+.legend_entry {
+    float: left;
+    display: flex;
+    align-items: center; /* align vertical */
+    margin-bottom: 10px;
+    margin-left: 50px;
+    width:200px;
+    border: dashed 1px white;
+    padding: 6px;
+
+}
+
+
+#play_button {
+    display: inline-block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 40%;
+    margin-top: 20px;
+    float:left;
+}
+
+#help{
+    display: inline-block;
+
+    margin-left: 10px;
+    margin-right: auto;
+    width: 40%;
+    margin-top: 20px;
+}
+
+.flexbox {
+    display: flex;
+    justify-content: center; /* align horizontal */
+    align-items: center; /* align vertical */
+}
+
+.player_statistic {
+    padding: 5px;
+    height: 45px;
+    display: flex;
+    justify-content: center; /* align horizontal */
+    align-items: center; /* align vertical */
+    margin-bottom: 10px;
+    border-radius: 5px;
+    border: solid #FFF 2px;
+    width: 150px;
+}
+
+.button {
+    background-image: -webkit-linear-gradient(top, rgba(80, 165, 230, 1) 0%, rgba(0, 39, 156, 1) 100%);
+    background-image: -moz-linear-gradient(top, rgba(80, 165, 230, 1) 0%, rgba(0, 39, 156, 1) 100%);
+    background-image: -ms-linear-gradient(top, rgba(80, 165, 230, 1) 0%, rgba(0, 39, 156, 1) 100%);
+    background-image: -o-linear-gradient(top, rgba(80, 165, 230, 1) 0%, rgba(0, 39, 156, 1) 100%);
+    background-image: linear-gradient(top, rgba(80, 165, 230, 1) 0%, rgba(0, 39, 156, 1) 100%);
+    -webkit-box-shadow: 0px 0px 2px 0px rgba(0, 0, 0, 1);
+    -moz-box-shadow: 0px 0px 2px 0px rgba(0, 0, 0, 1);
+    box-shadow: 0px 0px 2px 0px rgba(0, 0, 0, 1);
+    border: solid 1px rgba(148, 148, 148, 1);
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+    padding: 7px;
+    display: inline-block;
+    font-size: 16px;
+    font-family: sans-serif;
+    line-height: 27px;
+    text-align: center;
+    color: rgba(196, 196, 196, 1);
+    font-weight: bold;
+    text-transform: capitalize;
+    cursor: pointer;
+}
+
+.button:hover {
+    background-image: -webkit-linear-gradient(top, rgba(0, 39, 156, 1) 0%, rgba(80, 135, 230, 1) 100%);
+    background-image: -moz-linear-gradient(top, rgba(0, 39, 156, 1) 0%, rgba(80, 135, 230, 1) 100%);
+    background-image: -ms-linear-gradient(top, rgba(0, 39, 156, 1) 0%, rgba(80, 135, 230, 1) 100%);
+    background-image: -o-linear-gradient(top, rgba(0, 39, 156, 1) 0%, rgba(80, 135, 230, 1) 100%);
+    background-image: linear-gradient(top, rgba(0, 39, 156, 1) 0%, rgba(80, 135, 230, 1) 100%);
+    -webkit-box-shadow: 1px 1px 3px 0px rgba(6, 4, 66, 1);
+    -moz-box-shadow: 1px 1px 3px 0px rgba(6, 4, 66, 1);
+    box-shadow: 1px 1px 3px 0px rgba(6, 4, 66, 1);
+    color: rgba(255, 255, 255, 1);
+}
+
+.button:active {
+    padding: 5px;
+}

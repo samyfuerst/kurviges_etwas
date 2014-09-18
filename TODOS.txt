@@ -1,0 +1,20 @@
+
+
+KI für Singleplayer
+
+tauschen manchmal immer nur noch 2 von 3
+
+
+button on preperation to choose between single- and multiplayer
+
+---> singleplayer has just one field to select (color and) keys to navigate and number of players to play against
+
+
+
+anfangspositions abstand
+
+
+items einstell-möglichkeiten welche für das nächste spiel gelten
+
+detect ecken!
+
