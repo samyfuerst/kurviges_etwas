@@ -5,14 +5,14 @@
     <ignored path="achtung_die_kurve.iws" />
     <ignored path=".idea/workspace.xml" />
     <file path="/script.js" changelist="e7f42bab-84dc-49d0-ba95-93349395db68" time="1408736619799" ignored="false" />
-    <file path="/curve.js" changelist="e7f42bab-84dc-49d0-ba95-93349395db68" time="1410426193879" ignored="false" />
+    <file path="/curve.js" changelist="e7f42bab-84dc-49d0-ba95-93349395db68" time="1411043005258" ignored="false" />
     <file path="/curve.html" changelist="e7f42bab-84dc-49d0-ba95-93349395db68" time="1410189730867" ignored="false" />
     <file path="/style.css" changelist="e7f42bab-84dc-49d0-ba95-93349395db68" time="1410272362661" ignored="false" />
     <file path="/canvas.html" changelist="e7f42bab-84dc-49d0-ba95-93349395db68" time="1408745084882" ignored="false" />
     <file path="$PROJECT_DIR$/../ZeitlerKunst/style.css" changelist="e7f42bab-84dc-49d0-ba95-93349395db68" time="1408748062485" ignored="false" />
     <file path="/test.html" changelist="e7f42bab-84dc-49d0-ba95-93349395db68" time="1408841122645" ignored="false" />
     <file path="/a.dummy" changelist="e7f42bab-84dc-49d0-ba95-93349395db68" time="1409344522795" ignored="false" />
-    <file path="$PROJECT_DIR$/.idea/workspace.xml" changelist="e7f42bab-84dc-49d0-ba95-93349395db68" time="1410451242959" ignored="false" />
+    <file path="$PROJECT_DIR$/.idea/workspace.xml" changelist="e7f42bab-84dc-49d0-ba95-93349395db68" time="1411043025619" ignored="false" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -41,13 +41,13 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="curve.js" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="curve.js" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/curve.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="1604" column="34" selection-start="54739" selection-end="54739" vertical-scroll-proportion="0.278481">
+            <state line="1163" column="9" selection-start="43127" selection-end="43127" vertical-scroll-proportion="30.52">
               <folding>
-                <marker date="1410426660978" expanded="true" signature="7925:7943" placeholder="..." />
-                <marker date="1410426660978" expanded="true" signature="40836:40854" placeholder="..." />
+                <marker date="1411043024327" expanded="false" signature="7945:7963" placeholder="..." />
+                <marker date="1411043024327" expanded="false" signature="40856:40874" placeholder="..." />
               </folding>
             </state>
           </provider>
@@ -62,10 +62,10 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="curve.html" pinned="false" current="false" current-in-tab="false">
+      <file leaf-file-name="curve.html" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/curve.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="16" column="126" selection-start="468" selection-end="468" vertical-scroll-proportion="-3.9230769">
+            <state line="20" column="125" selection-start="609" selection-end="609" vertical-scroll-proportion="0.2607362">
               <folding />
             </state>
           </provider>
@@ -147,6 +147,7 @@
       <sortByType />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -167,7 +168,6 @@
           </PATH>
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -236,9 +236,9 @@
     <editor active="true" />
     <layout>
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32624114" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32740214" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.24961714" sideWeight="0.67375886" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.24961714" sideWeight="0.6725979" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
@@ -325,10 +325,41 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/curve.js">
       <provider selected="true" editor-type-id="text-editor">
+        <state line="1604" column="34" selection-start="54739" selection-end="54739" vertical-scroll-proportion="0.0">
+          <folding>
+            <marker date="1411043024327" expanded="false" signature="7945:7963" placeholder="..." />
+            <marker date="1411043024327" expanded="false" signature="40856:40874" placeholder="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/transform.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="97" column="0" selection-start="2612" selection-end="2612" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/curve.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="16" column="126" selection-start="468" selection-end="468" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/style.css">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="319" column="59" selection-start="5465" selection-end="5465" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/curve.js">
+      <provider selected="true" editor-type-id="text-editor">
         <state line="1562" column="23" selection-start="53507" selection-end="53507" vertical-scroll-proportion="0.0">
           <folding>
-            <marker date="1410426660978" expanded="true" signature="7925:7943" placeholder="..." />
-            <marker date="1410426660978" expanded="true" signature="40836:40854" placeholder="..." />
+            <marker date="1411043024327" expanded="false" signature="7945:7963" placeholder="..." />
+            <marker date="1411043024327" expanded="false" signature="40856:40874" placeholder="..." />
           </folding>
         </state>
       </provider>
@@ -358,8 +389,8 @@
       <provider selected="true" editor-type-id="text-editor">
         <state line="1606" column="35" selection-start="54859" selection-end="54859" vertical-scroll-proportion="0.0">
           <folding>
-            <marker date="1410426660978" expanded="true" signature="7925:7943" placeholder="..." />
-            <marker date="1410426660978" expanded="true" signature="40836:40854" placeholder="..." />
+            <marker date="1411043024327" expanded="false" signature="7945:7963" placeholder="..." />
+            <marker date="1411043024327" expanded="false" signature="40856:40874" placeholder="..." />
           </folding>
         </state>
       </provider>
@@ -392,20 +423,20 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/curve.html">
+    <entry file="file://$PROJECT_DIR$/curve.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="16" column="126" selection-start="468" selection-end="468" vertical-scroll-proportion="-3.9230769">
-          <folding />
+        <state line="1163" column="9" selection-start="43127" selection-end="43127" vertical-scroll-proportion="30.52">
+          <folding>
+            <marker date="1411043024327" expanded="false" signature="7945:7963" placeholder="..." />
+            <marker date="1411043024327" expanded="false" signature="40856:40874" placeholder="..." />
+          </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/curve.js">
+    <entry file="file://$PROJECT_DIR$/curve.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="1604" column="34" selection-start="54739" selection-end="54739" vertical-scroll-proportion="0.278481">
-          <folding>
-            <marker date="1410426660978" expanded="true" signature="7925:7943" placeholder="..." />
-            <marker date="1410426660978" expanded="true" signature="40836:40854" placeholder="..." />
-          </folding>
+        <state line="20" column="125" selection-start="609" selection-end="609" vertical-scroll-proportion="0.2607362">
+          <folding />
         </state>
       </provider>
     </entry>

@@ -4,6 +4,8 @@ var extraParties = ["self", "others", "all"];
 var individualExtras = ["thinner", "thicker", "faster", "slower", "rectangular", "upsideDown", "penetrating", "mine", "beam", "eraser"];
 var commonExtras = ["wallbreaking", "deleteAll", "randomExtras", "roleReversal"];
 
+var useKI = false;
+
 $(function () {
 
 
@@ -1136,7 +1138,9 @@ function Game() {
                     return;
                 }
 
-                var ki = new KI(instance);
+                var ki = null;
+                if (useKI)
+                    ki = new KI(instance);
 
                 instance.setPlayer(name, left, right, action, ki);
                 console.log(instance.players);
@@ -1699,14 +1703,14 @@ function KI(game, player) {
 
         } else if (left && right && !straight) {
 
-            if (shortest.dir == "left"&&counterLeft<counterRight) {
+            if (shortest.dir == "left" && counterLeft < counterRight) {
                 this.player.leftButtonPressed = true;
 
-            }else if(shortest.dir=="left")
-                this.player.rightButtonPresed=true;
-            else if (shortest.dir == "right"&&counterLeft>counterRight){
+            } else if (shortest.dir == "left")
+                this.player.rightButtonPresed = true;
+            else if (shortest.dir == "right" && counterLeft > counterRight) {
                 this.player.rightButtonPressed = true;
-            }else
+            } else
                 this.player.leftButtonPressed = true;
 
 
