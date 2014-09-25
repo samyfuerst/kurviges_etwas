@@ -4,7 +4,7 @@ var extraParties = ["self", "others", "all"];
 var individualExtras = ["thinner", "thicker", "faster", "slower", "rectangular", "upsideDown", "penetrating", "mine", "beam", "eraser"];
 var commonExtras = ["wallbreaking", "deleteAll", "randomExtras", "roleReversal"];
 
-var useKI = false;
+var useKI = true;
 
 $(function () {
 
@@ -16,7 +16,7 @@ $(function () {
         extraImages[ individualExtras[i]] = iImage;
 
         var indExtNames = individualExtras[i].replace(/\d+/g, '~$&').split(/(?=[A-Z])|~/);
-        ;
+
 
         var indExtName = "";
 
@@ -167,7 +167,7 @@ function Game() {
                     continue;
                 var dist = Math.sqrt(Math.pow(instance.players[i].position.x - pos.x, 2) + Math.pow(instance.players[i].position.y - pos.y, 2));
 
-                if (dist < 50){
+                if (dist < 50) {
                     console.log(true);
                     return setPos();
                 }
@@ -712,7 +712,7 @@ function Game() {
                                             for (var a = 0; a < instance.players.length; a++) {
                                                 if (instance.players[a].name == playerToReverse1.name)
                                                     i1 = a;
-                                                else if (instance.players[a].name ==playerToReverse2.name)
+                                                else if (instance.players[a].name == playerToReverse2.name)
                                                     i2 = a;
                                             }
 
@@ -1421,6 +1421,9 @@ function Player(name, rightKey, leftKey, actionKey, color, pos, ki) {
         this.killed = false;
         this.eraser = false;
 
+        if (this.ki)
+            this.ki.reset();
+
 
         this.clearTimeouts();
 
@@ -1587,183 +1590,256 @@ function Player(name, rightKey, leftKey, actionKey, color, pos, ki) {
 function KI(game, player) {
     this.game = game;
     this.lastDir = null;
+    this.lastPath = null;
 
     this.initiate = function (player) {
         this.player = player;
     };
 
+    this.reset = function () {
+        this.lastPath = null;
+    };
     this.step = function () {
 
         this.player.rightButtonPresed = false;
         this.player.leftButtonPressed = false;
 
-        var radius = 30;
-        var offset = this.player.weight;
 
-        var ctx = this.game.ctx;
+        var fullData = this.game.ctx.getImageData(0, 0, size.width, size.height);
 
-        var baseAngle = this.player.angle;
+        //check if path is consitent
 
+//        var pathConsistent = true;
+        var counter = 0;
+//
+//        if (this.lastPath) {
+//
+//            var cNode = this.lastPath.next;
+//
+//            while (cNode.next) {
+//                if (!isFree(cNode.x, cNode.y, this.player.speed * 2, cNode.angle, fullData, this.player.weight)) {
+//                    pathConsistent = false;
+//                    break;
+//
+//                }
+//                cNode = cNode.next;
+//                counter++;
+//            }
+//        } else
+//            pathConsistent = false;
+//
+//
+        var node;
+        var nextStep;
+//        if (!pathConsistent) {
+        counter = 30;
+        nextStep = getPositionRelativeToAngle(this.player.position.x, this.player.position.y, 2, this.player.angle);
+        node = calculateNextStep(nextStep.x, nextStep.y, fullData, this.player.angle, this.player.speed * 2, this.player.weight, counter);
 
-        var diagonal = Math.sqrt(Math.pow(radius * 2, 2) + Math.pow(radius * 2, 2));
-
-        var centerPos = getPositionRelativeToAngle(this.player.position.x, this.player.position.y, radius + offset, baseAngle);
-
-        var cornerRectangle = getPositionRelativeToAngle(centerPos.x, centerPos.y, diagonal / 2, baseAngle + getAngle(baseAngle));
-
-
-        function getAngle(x) {
-
-            return 225 - x;
-
-        }
-
-        //TODO mock
-        this.game.extraCtx.clearRect(0, 0, size.width, size.height);
-        this.game.extraCtx.beginPath();
-        this.game.extraCtx.fillStyle = "red";
-        this.game.extraCtx.arc(centerPos.x, centerPos.y, radius, 0, Math.PI * 2, false);
-        this.game.extraCtx.fill();
-        this.game.extraCtx.closePath();
-
-
-        var imgData = ctx.getImageData(cornerRectangle.x, cornerRectangle.y, radius * 2, radius * 2);
-
-
-        var counterRight = 0;
-        var counterLeft = 0;
-
-        var shortest = {dir: "right", dist: radius * 2};
-
-        var point = offset;
-        var straight = true;
-
-        //TODO: improve detection!
-
-        while (point < radius * 2) {
-            var p = getPositionRelativeToAngle(this.player.position.x, this.player.position.y, point, this.player.angle);
-            var imDa = ctx.getImageData(p.x, p.y, 1, 1);
-            var h = "#" + ("000000" + ((imDa.data[0] << 16) | (imDa.data[ 1] << 8) | imDa.data[2]).toString(16)).slice(-6);
-
-            if (h != "#000000" || p.x <= 5 || p.x >= size.width - 4 || p.y <= 4 || p.y >= size.height - 4) {
-                straight = false;
-                break;
-            }
-
-            point += 4;
-        }
+//        } else {
+//            counter = 30 - counter;
+//            nextStep = getPositionRelativeToAngle(cNode.x, cNode.y, 1, cNode.angle);
+//            var following = calculateNextStep(nextStep.x, nextStep.y, fullData, this.player.angle, this.player.speed * 2, this.player.weight, counter);
+//
+//            while (cNode.next) {
+//
+//                cNode = cNode.next;
+//            }
+//            cNode.next = following;
+//
+//        }
 
 
-        if (!straight) {
-
-            for (var i = 0; i < imgData.data.length; i += 4) {
-
-                var hex = "#" + ("000000" + ((imgData.data[i] << 16) | (imgData.data[i + 1] << 8) | imgData.data[i + 2]).toString(16)).slice(-6);
-
-                var x = cornerRectangle.x + ((i / 4) % (radius * 2));// is width
-                var y = cornerRectangle.y + Math.floor((i / 4) / (radius * 2));// is width
-
-
-                var dist = Math.sqrt(Math.pow(centerPos.x - x, 2) + Math.pow(centerPos.y - y, 2));
-
-
-                var startPoint = getPositionRelativeToAngle(this.player.position.x, this.player.position.y, offset, baseAngle);
-                var endPoint = getPositionRelativeToAngle(startPoint.x, startPoint.y, radius * 2, baseAngle);
-
-
-                var absoluteDist = Math.sqrt(Math.pow(startPoint.x - x, 2) + Math.pow(startPoint.y - y, 2));
-
-
-                if (hex != "#000000" && dist <= radius) {
-                    if (isLeftFromLine(startPoint, endPoint, {x: x, y: y})) {
-                        counterRight += radius * 2 - absoluteDist;
-
-
-                        if (absoluteDist < shortest.dist) {
-                            shortest.dist = absoluteDist;
-                            shortest.dir = "right";
-                        }
-                    }
-                    else {
-
-                        counterLeft += radius * 2 - absoluteDist;
-                        if (absoluteDist < shortest.dist) {
-                            shortest.dist = absoluteDist;
-                            shortest.dir = "left";
-                        }
-                    }
-                } else if (x <= 4 || x >= size.width - 4 || y <= 4 || y >= size.height - 4) {
-
-                    if (isLeftFromLine(startPoint, endPoint, {x: x, y: y})) {
-                        counterRight += radius * 2 - absoluteDist;
-                        if (absoluteDist < shortest.dist) {
-                            shortest.dist = absoluteDist;
-                            shortest.dir = "right";
-                        }
-                    }
-                    else {
-                        counterLeft += radius * 2 - absoluteDist;
-                        if (absoluteDist < shortest.dist) {
-                            shortest.dist = absoluteDist;
-                            shortest.dir = "left";
-                        }
-                    }
-                }
-            }
-        }
-
-        var right = false;
-        var left = false;
-
-//        if (counterLeft < counterRight)
-//            right = false;
-//        if (counterLeft > counterRight)
-//            left = false;
-
-        if (counterLeft > 0)
-            left = true;
-        if (counterRight > 0)
-            right = true;
-
-        this.player.actionFired = false;
-
-        if (left && !right && !straight) {
+        if (!node)
+            return;
+        if (node.angle < this.player.angle) {
             this.player.leftButtonPressed = true;
-        } else if (right && !left && !straight) {
+        } else if (node.angle > this.player.angle) {
             this.player.rightButtonPresed = true;
-
-
-        } else if (left && right && !straight) {
-
-            if (shortest.dir == "left" && counterLeft < counterRight) {
-                this.player.leftButtonPressed = true;
-
-            } else if (shortest.dir == "left")
-                this.player.rightButtonPresed = true;
-            else if (shortest.dir == "right" && counterLeft > counterRight) {
-                this.player.rightButtonPressed = true;
-            } else
-                this.player.leftButtonPressed = true;
-
-
-        } else {
-            var dir = getRandomInt(-1, 1);
-
-            switch (dir) {
-                case -1:
-                    this.player.leftButtonPressed = true;
-                    break;
-
-                case 1:
-                    this.player.rightButtonPresed = true;
-                    break;
-
-                default:
-                    break;
-            }
-
-            console.log("nothing")
         }
+
+        this.lastPath = node;
+
+
+        var n = node;
+        this.game.extraCtx.clearRect(0, 0, size.width, size.height);
+
+        while (n.next) {
+            this.game.extraCtx.beginPath();
+            this.game.extraCtx.fillStyle = "red";
+            this.game.extraCtx.arc(n.x, n.y, 2, 0, Math.PI * 2, false);
+            this.game.extraCtx.fill();
+            this.game.extraCtx.closePath();
+            n = n.next;
+        }
+
+//        var radius = 30;
+//        var offset = this.player.weight;
+//
+//        var ctx = this.game.ctx;
+//
+//        var baseAngle = this.player.angle;
+//
+//
+//        var diagonal = Math.sqrt(Math.pow(radius * 2, 2) + Math.pow(radius * 2, 2));
+//
+//        var centerPos = getPositionRelativeToAngle(this.player.position.x, this.player.position.y, radius + offset, baseAngle);
+//
+//        var cornerRectangle = getPositionRelativeToAngle(centerPos.x, centerPos.y, diagonal / 2, baseAngle + getAngle(baseAngle));
+//
+//
+//        function getAngle(x) {
+//
+//            return 225 - x;
+//
+//        }
+//
+//        //TODO mock
+//        this.game.extraCtx.clearRect(0, 0, size.width, size.height);
+//        this.game.extraCtx.beginPath();
+//        this.game.extraCtx.fillStyle = "red";
+//        this.game.extraCtx.arc(centerPos.x, centerPos.y, radius, 0, Math.PI * 2, false);
+//        this.game.extraCtx.fill();
+//        this.game.extraCtx.closePath();
+//
+//
+//        var imgData = ctx.getImageData(cornerRectangle.x, cornerRectangle.y, radius * 2, radius * 2);
+//
+//
+//        var counterRight = 0;
+//        var counterLeft = 0;
+//
+//        var shortest = {dir: "right", dist: radius * 2};
+//
+//        var point = offset;
+//        var straight = true;
+//
+//        //TODO: improve detection!
+//
+//        while (point < radius * 2) {
+//            var p = getPositionRelativeToAngle(this.player.position.x, this.player.position.y, point, this.player.angle);
+//            var imDa = ctx.getImageData(p.x, p.y, 1, 1);
+//            var h = "#" + ("000000" + ((imDa.data[0] << 16) | (imDa.data[ 1] << 8) | imDa.data[2]).toString(16)).slice(-6);
+//
+//            if (h != "#000000" || p.x <= 5 || p.x >= size.width - 4 || p.y <= 4 || p.y >= size.height - 4) {
+//                straight = false;
+//                break;
+//            }
+//
+//            point += 4;
+//        }
+//
+//
+//        if (!straight) {
+//
+//            for (var i = 0; i < imgData.data.length; i += 4) {
+//
+//                var hex = "#" + ("000000" + ((imgData.data[i] << 16) | (imgData.data[i + 1] << 8) | imgData.data[i + 2]).toString(16)).slice(-6);
+//
+//                var x = cornerRectangle.x + ((i / 4) % (radius * 2));// is width
+//                var y = cornerRectangle.y + Math.floor((i / 4) / (radius * 2));// is width
+//
+//
+//                var dist = Math.sqrt(Math.pow(centerPos.x - x, 2) + Math.pow(centerPos.y - y, 2));
+//
+//
+//                var startPoint = getPositionRelativeToAngle(this.player.position.x, this.player.position.y, offset, baseAngle);
+//                var endPoint = getPositionRelativeToAngle(startPoint.x, startPoint.y, radius * 2, baseAngle);
+//
+//
+//                var absoluteDist = Math.sqrt(Math.pow(startPoint.x - x, 2) + Math.pow(startPoint.y - y, 2));
+//
+//
+//                if (hex != "#000000" && dist <= radius) {
+//                    if (isLeftFromLine(startPoint, endPoint, {x: x, y: y})) {
+//                        counterRight += radius * 2 - absoluteDist;
+//
+//
+//                        if (absoluteDist < shortest.dist) {
+//                            shortest.dist = absoluteDist;
+//                            shortest.dir = "right";
+//                        }
+//                    }
+//                    else {
+//
+//                        counterLeft += radius * 2 - absoluteDist;
+//                        if (absoluteDist < shortest.dist) {
+//                            shortest.dist = absoluteDist;
+//                            shortest.dir = "left";
+//                        }
+//                    }
+//                } else if (x <= 4 || x >= size.width - 4 || y <= 4 || y >= size.height - 4) {
+//
+//                    if (isLeftFromLine(startPoint, endPoint, {x: x, y: y})) {
+//                        counterRight += radius * 2 - absoluteDist;
+//                        if (absoluteDist < shortest.dist) {
+//                            shortest.dist = absoluteDist;
+//                            shortest.dir = "right";
+//                        }
+//                    }
+//                    else {
+//                        counterLeft += radius * 2 - absoluteDist;
+//                        if (absoluteDist < shortest.dist) {
+//                            shortest.dist = absoluteDist;
+//                            shortest.dir = "left";
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//
+//        var right = false;
+//        var left = false;
+//
+////        if (counterLeft < counterRight)
+////            right = false;
+////        if (counterLeft > counterRight)
+////            left = false;
+//
+//        if (counterLeft > 0)
+//            left = true;
+//        if (counterRight > 0)
+//            right = true;
+//
+//        this.player.actionFired = false;
+//
+//        if (left && !right && !straight) {
+//            this.player.leftButtonPressed = true;
+//        } else if (right && !left && !straight) {
+//            this.player.rightButtonPresed = true;
+//
+//
+//        } else if (left && right && !straight) {
+//
+//            if (shortest.dir == "left" && counterLeft < counterRight) {
+//                this.player.leftButtonPressed = true;
+//
+//            } else if (shortest.dir == "left")
+//                this.player.rightButtonPresed = true;
+//            else if (shortest.dir == "right" && counterLeft > counterRight) {
+//                this.player.rightButtonPressed = true;
+//            } else
+//                this.player.leftButtonPressed = true;
+//
+//
+//        } else {
+//            var dir = getRandomInt(-1, 1);
+//
+//            switch (dir) {
+//                case -1:
+//                    this.player.leftButtonPressed = true;
+//                    break;
+//
+//                case 1:
+//                    this.player.rightButtonPresed = true;
+//                    break;
+//
+//                default:
+//                    break;
+//            }
+//
+//            console.log("nothing")
+//        }
 
 
     }
@@ -1775,6 +1851,180 @@ function isLeftFromLine(lineStart, lineEnd, point) {
     return ((lineEnd.x - lineStart.x) * (point.y - lineStart.y) - (lineEnd.y - lineStart.y) * (point.x - lineStart.x)) > 0;
 
 }
+//
+//function Area(start, end) {
+//    this.start = start;
+//    this.end = end;
+//}
+
+//function getBiggestFreeAreas(imgData,width,height) {
+////TODO: ist erreichbar? nähester Punkt?
+//
+//    counter
+//    for (var i = 0; i < imgData.data.length; i += 4) {
+//
+//        var hex = "#" + ("000000" + ((imgData.data[i] << 16) | (imgData.data[i + 1] << 8) | imgData.data[i + 2]).toString(16)).slice(-6);
+//
+//        var x = (i / 4) % width;
+//        var y = Math.floor((i / 4) / height);
+//
+//
+//
+//
+//    }
+//
+//}
+
+function isFree(x, y, range, angle, imgData, width) {
+    var nextNode = getPositionRelativeToAngle(x, y, range, angle);
+
+    if (!checkPoint(nextNode.x, nextNode.y))
+        return false;
+
+    var counter = 1;
+    while (counter <= width ) {
+
+        var leftNode = getPositionRelativeToAngle(x, y, counter, angle - 90);
+        var rightNode = getPositionRelativeToAngle(x, y, counter, angle + 90);
+
+        if (!checkPoint(leftNode.x, leftNode.y) || !checkPoint(rightNode.x, rightNode.y))
+            return false;
+        counter++;
+
+    }
+
+    function checkPoint(x, y) {
+        if (nextNode.x < 5 || nextNode.x > size.width - 5 || nextNode.y < 5 || nextNode.y > size.height - 5)
+            return false;
+        var index = ((Math.floor(y) * imgData.width + Math.floor(x) ) * 4);
+        return getHex(imgData, index) == "#000000";
+
+    }
+
+    return true;
+}
+
+
+function getHex(imgData, index) {
+
+    return "#" + ("000000" + ((imgData.data[index] << 16) | (imgData.data[index + 1] << 8) | imgData.data[index + 2]).toString(16)).slice(-6);
+}
+
+
+function Node(parent, x, y, angle) {
+    this.x = x;
+    this.y = y;
+    this.angle = angle;
+    this.next = null;
+    this.prev = parent;
+    this.root = parent ? false : true;
+    this.straight = true;
+    this.left = true;
+    this.right = true;
+}
+
+
+function heuristic(node){
+    var assignment={"left":0,"right":0,"straight":0};
+    while(node.next){
+
+        if (node.left)
+            assignment.left++;
+        if (node.right)
+            assignment.right++;
+        if (node.straight)
+            assignment.straight++;
+        node=node.next;
+    }
+
+    var max=0;
+    var dir=null;
+    for (var a in assignment){
+        if (assignment[a]<max)
+            dir=a;
+    }
+    console.log(assignment,dir);
+    return dir;
+
+}
+
+function calculateNextStep(x, y, imgData, angle, range, playersWidth, depth) {
+
+    console.log(depth);
+
+    var allOverCounter = 0;
+
+    var head = new Node(null, x, y, angle);
+    var currentPoint = head;
+
+    var counter=0;
+
+    while (allOverCounter < depth&&counter<50000) {
+        counter++;
+        var next;
+
+        console.log(allOverCounter,currentPoint.straight,currentPoint.left,currentPoint.right);
+
+        var free = isFree(currentPoint.x, currentPoint.y, range, currentPoint.angle, imgData, playersWidth);
+
+
+        if (free && currentPoint.straight) {
+            next = getPositionRelativeToAngle(currentPoint.x, currentPoint.y, range, currentPoint.angle);
+            currentPoint.next = new Node(currentPoint, next.x, next.y, currentPoint.angle);
+            currentPoint.straight = false;
+            currentPoint = currentPoint.next;
+
+            allOverCounter++;
+            continue;
+        }
+
+        free = isFree(currentPoint.x, currentPoint.y, range, currentPoint.angle + 8, imgData, playersWidth);
+        if (free && currentPoint.right) {
+
+            next = getPositionRelativeToAngle(currentPoint.x, currentPoint.y, range, currentPoint.angle + 8);
+            currentPoint.next = new Node(currentPoint, next.x, next.y, currentPoint.angle + 8);
+            currentPoint.right = false;
+            currentPoint = currentPoint.next;
+
+            allOverCounter++;
+            continue;
+
+        }
+
+        free = isFree(currentPoint.x, currentPoint.y, range, currentPoint.angle - 8, imgData, playersWidth);
+        if (free && currentPoint.left) {
+
+            next = getPositionRelativeToAngle(currentPoint.x, currentPoint.y, range, currentPoint.angle - 8);
+            currentPoint.next = new Node(currentPoint, next.x, next.y, currentPoint.angle - 8);
+            currentPoint.left = false;
+            allOverCounter++;
+            currentPoint = currentPoint.next;
+            continue;
+
+        }
+        if (currentPoint.root)
+            return null;
+
+        allOverCounter--;
+        currentPoint = currentPoint.prev;
+
+
+    }
+
+
+//    var n = head;
+
+//    console.log(angle+" :")
+//    while (n.next){
+//
+//        console.log(n.angle)
+//        n= n.next;
+//    }
+
+    return head.next;
+
+}
+
 
 function getAngleOfLineBetweenTwoPoints(p1, p2) {
     var xDiff = p2.x - p1.x;
