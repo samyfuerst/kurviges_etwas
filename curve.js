@@ -168,7 +168,6 @@ function Game() {
                 var dist = Math.sqrt(Math.pow(instance.players[i].position.x - pos.x, 2) + Math.pow(instance.players[i].position.y - pos.y, 2));
 
                 if (dist < 50) {
-                    console.log(true);
                     return setPos();
                 }
             }
@@ -182,8 +181,24 @@ function Game() {
 
     this.setPlayer = function (playerName, leftKey, rightKey, actionKey, ki) {
 
+        var len = this.players.length;
+        while (len--) {
+            if (this.players[len].name == playerName) {
+                this.players.splice(len, 1);
+                break;
+            }
+        }
+
         var pos = this.calculatePlayersPosWithDistance();
-        this.players.push(new Player(playerName, rightKey, leftKey, actionKey, this.playerColors[playerName], pos, ki));
+
+        var kiInstance = ki ? new KI(this) : null;
+
+        rightKey = ki ? null : rightKey;
+        actionKey = ki ? null : actionKey;
+        leftKey = ki ? null : leftKey;
+
+
+        this.players.push(new Player(playerName, rightKey, leftKey, actionKey, this.playerColors[playerName], pos, kiInstance));
     };
 
 
@@ -1056,6 +1071,7 @@ function Game() {
             var code = e.keyCode ? e.keyCode : e.which;
 
             if (code == 27) {
+                $("#checkbox_" + instance.activePlayer).show();
                 instance.unbindKeyListener();
                 instance.bindMaskListener();
 
@@ -1072,6 +1088,7 @@ function Game() {
             } else if (instance.keyCounter == 2) {
                 $("#action_key_" + instance.activePlayer).attr("name", code)
                 $("#action_key_" + instance.activePlayer).text(String.fromCharCode(code));
+                $("#checkbox_" + instance.activePlayer).show();
                 instance.unbindKeyListener();
                 instance.bindMaskListener();
 
@@ -1089,13 +1106,10 @@ function Game() {
         this.keyCounter = 0;
 
     };
-    this.bindMaskListener = function () {
-        var masks = $(".mask");
+
+    this.bindSingleMaskListener = function (m) {
         var instance = this;
-        masks.show();
-        this.unbindKeyListener();
-        masks.on("click", function () {
-            var m = $(this);
+        m.on("click", function () {
             instance.activePlayer = m.parent().attr("id");
 
             $("#left_key_" + instance.activePlayer).attr("name", "");
@@ -1106,7 +1120,20 @@ function Game() {
             $("#action_key_" + instance.activePlayer).text("");
 
             m.hide();
+            $("#checkbox_" + m.attr("name")).hide();
             instance.bindKeyListener();
+
+
+        });
+
+    };
+    this.bindMaskListener = function () {
+        var masks = $(".mask");
+        var instance = this;
+        masks.show();
+        this.unbindKeyListener();
+        $.each(masks, function () {
+            instance.bindSingleMaskListener($(this));
         });
     };
 
@@ -1125,15 +1152,46 @@ function Game() {
             var name = this.potentialPlayerNames[i];
 
             $("#players_container").append("<div  id='" + name + "' class='player relative'>" +
-                "<div class='mask'></div>" +
+                "<div class='mask'  id='mask_" + name + "' name='" + name + "'  ></div>" +
                 "<span class='float_left player_label' style='background-color: " + this.playerColors[name] + "'>" + name + "</span>" +
-                "<span class='float_left key_input' id='left_key_" + name + "' ></span>" +
-                "<span class='float_left key_input' id='right_key_" + name + "'></span>" +
-                "<span class='float_left key_input' id='action_key_" + name + "'></span>" +
+                "<div  id='checkbox_" + name + "' class='checkbox float_left'>" +
+                "<input type='checkbox' class='checkbox_ki' value='1' id='checkbox_input_" + name + "' name='" + name + "'  />" +
+                "<label class='flexbox' for=checkbox_input_" + name + ">KI</label>" +
+                "</div>" +
+                "<span class='float_left key_input' id='left_key_" + name + "' data='" + name + "' ></span>" +
+                "<span class='float_left key_input' id='right_key_" + name + "' data='" + name + "' ></span>" +
+                "<span class='float_left key_input' id='action_key_" + name + "' data='" + name + "' ></span>" +
+
                 "</div>");
 
 
         }
+
+
+        $(".checkbox_ki").change(function (e) {
+            var cb = $(this);
+            var name = cb.prop("name");
+
+            if (cb.prop('checked')) {
+                $.each($(".key_input"), function (index) {
+                    if ($(this).attr("data") == name) {
+                        $(this).hide();
+                    }
+                    $("#mask_" + name).hide();
+
+                });
+            } else {
+                $.each($(".key_input"), function (index) {
+                    if ($(this).attr("data") == name) {
+                        $(this).show();
+
+                    }
+                });
+
+                $("#mask_" + name).show();
+
+            }
+        });
 
         this.bindMaskListener();
 
@@ -1151,28 +1209,26 @@ function Game() {
                 var right = $("#right_key_" + name).attr("name");
                 var action = $("#action_key_" + name).attr("name");
 
+                var ki = $("#checkbox_input_" + name).prop("checked");
 
-                if ((typeof left == "undefined" || left === "") && (typeof right == "undefined" || right === "") && (typeof action == "undefined" || action === "")) {
+                if (!ki && ((typeof left == "undefined" || left === "") && (typeof right == "undefined" || right === "") && (typeof action == "undefined" || action === ""))) {
                     continue;
-                } else if (typeof left == "undefined" || left == "") {
+                } else if (!ki && (typeof left == "undefined" || left == "")) {
                     alert(name + ", please set your left key");
                     return;
-                } else if (typeof right == "undefined" || right == "") {
+                } else if (!ki && (typeof right == "undefined" || right == "")) {
                     alert(name + ", please set your right key");
                     return;
                 }
-                else if (typeof action == "undefined" || action == "") {
+                else if (!ki && (typeof action == "undefined" || action == "")) {
                     alert(name + ", please set your action key");
                     return;
                 }
-                if (left === right || action === right || action === left) {
+                if (!ki && (left === right || action === right || action === left)) {
                     alert(name + ", you chose the same key for both directions or your action key");
                     return;
                 }
 
-                var ki = null;
-                if (useKI)
-                    ki = new KI(instance);
 
                 instance.setPlayer(name, left, right, action, ki);
                 console.log(instance.players);
@@ -1587,17 +1643,17 @@ function Player(name, rightKey, leftKey, actionKey, color, pos, ki) {
 
 
 }
-function KI(game, player) {
+function KI(game) {
     this.game = game;
-    this.lastDir = null;
-    this.lastPath = null;
+
+    this.path = [];
 
     this.initiate = function (player) {
         this.player = player;
     };
 
     this.reset = function () {
-        this.lastPath = null;
+        this.path = [];
     };
     this.step = function () {
 
@@ -1607,47 +1663,18 @@ function KI(game, player) {
 
         var fullData = this.game.ctx.getImageData(0, 0, size.width, size.height);
 
-        //check if path is consitent
 
-//        var pathConsistent = true;
-        var counter = 0;
-//
-//        if (this.lastPath) {
-//
-//            var cNode = this.lastPath.next;
-//
-//            while (cNode.next) {
-//                if (!isFree(cNode.x, cNode.y, this.player.speed * 2, cNode.angle, fullData, this.player.weight)) {
-//                    pathConsistent = false;
-//                    break;
-//
-//                }
-//                cNode = cNode.next;
-//                counter++;
-//            }
-//        } else
-//            pathConsistent = false;
-//
-//
-        var node;
+        //start simple one
+
         var nextStep;
-//        if (!pathConsistent) {
         counter = 30;
         nextStep = getPositionRelativeToAngle(this.player.position.x, this.player.position.y, 2, this.player.angle);
-        node = calculateNextStep(nextStep.x, nextStep.y, fullData, this.player.angle, this.player.speed * 2, this.player.weight, counter);
+        this.path = calculateNextStep(nextStep.x, nextStep.y, fullData, this.player.angle, this.player.speed * 2, this.player.weight, counter);
 
-//        } else {
-//            counter = 30 - counter;
-//            nextStep = getPositionRelativeToAngle(cNode.x, cNode.y, 1, cNode.angle);
-//            var following = calculateNextStep(nextStep.x, nextStep.y, fullData, this.player.angle, this.player.speed * 2, this.player.weight, counter);
-//
-//            while (cNode.next) {
-//
-//                cNode = cNode.next;
-//            }
-//            cNode.next = following;
-//
-//        }
+
+        if (!this.path)
+            return;
+        var node = this.path[1];
 
 
         if (!node)
@@ -1661,17 +1688,96 @@ function KI(game, player) {
         this.lastPath = node;
 
 
-        var n = node;
         this.game.extraCtx.clearRect(0, 0, size.width, size.height);
 
-        while (n.next) {
-            this.game.extraCtx.beginPath();
-            this.game.extraCtx.fillStyle = "red";
-            this.game.extraCtx.arc(n.x, n.y, 2, 0, Math.PI * 2, false);
-            this.game.extraCtx.fill();
-            this.game.extraCtx.closePath();
-            n = n.next;
-        }
+        for (var k = 0; k < this.path.length; k++) {
+                var n = this.path[k];
+                this.game.extraCtx.beginPath();
+                this.game.extraCtx.fillStyle = "red";
+                this.game.extraCtx.arc(n.x, n.y, 2, 0, Math.PI * 2, false);
+                this.game.extraCtx.fill();
+                this.game.extraCtx.closePath();
+            }
+
+        //end simple one
+
+//       //TODO: warum brichts immer schon am anfang ab wenns wo anstößt?
+//        var pathConsistent = true;
+//        var i = 0;
+//        if (this.path && this.path.length > 1) {
+//            for (; i < this.path.length; i++) {
+//                var step = this.path[i];
+//
+//                if (!isFree(step.x, step.y, this.player.speed * 2, step.angle, fullData, this.player.weight)) {
+//                    console.log(step.x,step.y,step.angle,"harter break",i);
+//                    break;
+//                }
+//            }
+//            i--;
+//        } else {
+//            pathConsistent = false;
+//        }
+//        if (i < 1)
+//            pathConsistent = false;
+//
+//
+//        var nextStep;
+//        var counter = 20 - i;
+//
+//        console.log(i);
+//        if (pathConsistent){
+//            i=i<1?1:i;
+//            nextStep =  this.path[i-1];
+//        }
+//        else
+//            nextStep =  {x:this.player.position.x,y:this.player.position.y,angle:this.player.angle};
+//
+//
+//
+//        var followingPath = calculateNextStep(nextStep.x, nextStep.y, fullData,nextStep.angle, this.player.speed * 2, this.player.weight, counter);
+//
+//
+//        if (followingPath) {
+//            var tmpPath = [];
+//            for (var j = 0; j < 20; j++) {
+//                if (j < i) {
+//                    console.log("PATH",j,this.path[j]);
+//                    tmpPath[j] = this.path[j];
+//                } else {
+//                    console.log("FOLLOWING",j,followingPath[j-i]);
+//                    tmpPath[j] = followingPath[j - i];
+//                }
+//            }
+//            this.path = tmpPath;
+//            this.game.extraCtx.clearRect(0, 0, size.width, size.height);
+//
+//            for (var k = 0; k < this.path.length; k++) {
+//                var n = this.path[k];
+//                this.game.extraCtx.beginPath();
+//                this.game.extraCtx.fillStyle = "red";
+//                this.game.extraCtx.arc(n.x, n.y, 2, 0, Math.PI * 2, false);
+//                this.game.extraCtx.fill();
+//                this.game.extraCtx.closePath();
+//            }
+//
+//        } else{
+//            return;
+//        }
+//
+//        if (!this.path)
+//            return;
+//
+//        var node = this.path[0];
+//
+//
+//        if (node.angle < this.player.angle) {
+//            this.player.leftButtonPressed = true;
+//        } else if (node.angle > this.player.angle) {
+//            this.player.rightButtonPresed = true;
+//        }
+//
+//          this.path.splice(0,1);
+
 
 //        var radius = 30;
 //        var offset = this.player.weight;
@@ -1882,7 +1988,7 @@ function isFree(x, y, range, angle, imgData, width) {
         return false;
 
     var counter = 1;
-    while (counter <= width ) {
+    while (counter <= width / 2) {
 
         var leftNode = getPositionRelativeToAngle(x, y, counter, angle - 90);
         var rightNode = getPositionRelativeToAngle(x, y, counter, angle + 90);
@@ -1911,6 +2017,12 @@ function getHex(imgData, index) {
 }
 
 
+function LinkedList(head) {
+    this.head = head;
+    this.tail = head;
+
+}
+
 function Node(parent, x, y, angle) {
     this.x = x;
     this.y = y;
@@ -1921,107 +2033,307 @@ function Node(parent, x, y, angle) {
     this.straight = true;
     this.left = true;
     this.right = true;
+
+    this.finished = function () {
+        return !(this.straight && this.left && this.right);
+    }
 }
 
 
-function heuristic(node){
-    var assignment={"left":0,"right":0,"straight":0};
-    while(node.next){
+function heuristic(node) {
 
+    //mock
+    return ["straight", "left", "right"];
+
+    var assignment = {"left": 0, "right": 0, "straight": 0};
+    while (node.next) {
         if (node.left)
             assignment.left++;
         if (node.right)
             assignment.right++;
         if (node.straight)
             assignment.straight++;
-        node=node.next;
+        node = node.next;
     }
 
-    var max=0;
-    var dir=null;
-    for (var a in assignment){
-        if (assignment[a]<max)
-            dir=a;
-    }
-    console.log(assignment,dir);
-    return dir;
+    var keys = Object.keys(assignment);
+
+    keys.sort(function (a, b) {
+        return assignment[a] - assignment[b]
+    });
+
+    keys.reverse();
+
+    return keys;
 
 }
 
+function Location(x, y) {
+    this.x = x;
+    this.y = y;
+    this.possible = true;
+}
+
+function Locations() {
+    this.list = [];
+
+    this.add = function (location) {
+        this.list.push(location);
+    };
+    this.get = function (x, y) {
+        for (var i = 0; i < this.list.length; i++) {
+            if (x == this.list[i].x && y == this.list[i].y) {
+                return this.list[i];
+
+            }
+        }
+        return null;
+    };
+    this.isPossible = function (x, y) {
+        var location = this.get(x, y);
+        if (!location) {
+            return true;
+        }
+        return location.possible;
+
+    };
+    this.contains = function (x, y) {
+        return this.get(x, y) ? true : false;
+    }
+}
+
+
 function calculateNextStep(x, y, imgData, angle, range, playersWidth, depth) {
 
-    console.log(depth);
-
-    var allOverCounter = 0;
+    var visitedLocations = new Locations();
+    depth = depth || 30;
 
     var head = new Node(null, x, y, angle);
-    var currentPoint = head;
 
-    var counter=0;
-
-    while (allOverCounter < depth&&counter<50000) {
-        counter++;
-        var next;
-
-        console.log(allOverCounter,currentPoint.straight,currentPoint.left,currentPoint.right);
-
-        var free = isFree(currentPoint.x, currentPoint.y, range, currentPoint.angle, imgData, playersWidth);
+    var solution = [];
 
 
-        if (free && currentPoint.straight) {
-            next = getPositionRelativeToAngle(currentPoint.x, currentPoint.y, range, currentPoint.angle);
-            currentPoint.next = new Node(currentPoint, next.x, next.y, currentPoint.angle);
-            currentPoint.straight = false;
-            currentPoint = currentPoint.next;
+    sucheAusgang(head, 0);
 
-            allOverCounter++;
-            continue;
+//    var currentNode=head;
+//    for (var i=0;i<solution.length;i++){
+//        currentNode.next=new Node(currentNode,solution[i].x,solution[i].y,solution[i].angle);
+//        currentNode=currentNode.next;
+//    }
+//    return currentNode;
+
+    if (solution[1])
+        return solution;
+    return null;
+
+    function erweitereLoesung(x, y, a) {
+        solution.push({"x": x, "y": y, "angle": a});
+    }
+
+    function straight(n) {
+        return nextAngle(n.x, n.y, n.angle, 0);
+    }
+
+    function right(n) {
+        return nextAngle(n.x, n.y, n.angle, 8);
+    }
+
+    function left(n) {
+        return nextAngle(n.x, n.y, n.angle, -8);
+    }
+
+    function nextAngle(x, y, angle, offset) {
+        var free = isFree(x, y, range, angle + offset, imgData, playersWidth);
+        if (free) {
+            return offset;
         }
+        return null;
+    }
 
-        free = isFree(currentPoint.x, currentPoint.y, range, currentPoint.angle + 8, imgData, playersWidth);
-        if (free && currentPoint.right) {
+    function sucheAusgang(node, index) {
+        var h = heuristic(node);
+//
+        for (var i = 0; i < h.length; i++) {
+// wähle neuen Schritt
+            var dir = h[i];
+//
+            var further = (eval(dir))(node);
 
-            next = getPositionRelativeToAngle(currentPoint.x, currentPoint.y, range, currentPoint.angle + 8);
-            currentPoint.next = new Node(currentPoint, next.x, next.y, currentPoint.angle + 8);
-            currentPoint.right = false;
-            currentPoint = currentPoint.next;
+            var next = getPositionRelativeToAngle(node.x, node.y, range, node.angle + further);
 
-            allOverCounter++;
-            continue;
 
+// Schritt gültig?
+            if (isFree(next.x, next.y, range, node.angle + further, imgData, playersWidth)) {
+                erweitereLoesung(next.x, next.y, node.angle + further);
+// überprüfe Lösung
+                if (solution.length < depth) {
+// rekursiver Aufruf
+                    if (visitedLocations.isPossible(next.x, next.y) && sucheAusgang(new Node(node, next.x, next.y, node.angle + further))) {
+                        return true;
+                    } else {
+// mache Schritt rückgängig
+                        solution.splice(solution.length - 1, 1);
+                        if (!visitedLocations.contains(next.x, next.y))
+                            visitedLocations.add(new Location(next.x, next.y));
+                    }
+                } else {
+                    return true;
+                }
+            }
         }
-
-        free = isFree(currentPoint.x, currentPoint.y, range, currentPoint.angle - 8, imgData, playersWidth);
-        if (free && currentPoint.left) {
-
-            next = getPositionRelativeToAngle(currentPoint.x, currentPoint.y, range, currentPoint.angle - 8);
-            currentPoint.next = new Node(currentPoint, next.x, next.y, currentPoint.angle - 8);
-            currentPoint.left = false;
-            allOverCounter++;
-            currentPoint = currentPoint.next;
-            continue;
-
-        }
-        if (currentPoint.root)
-            return null;
-
-        allOverCounter--;
-        currentPoint = currentPoint.prev;
-
-
+        if (!visitedLocations.contains(node.x, node.y))
+            visitedLocations.add(new Location(node.x, node.y));
+        visitedLocations.get(node.x, node.y).possible = false;
+        return false;
     }
 
 
-//    var n = head;
-
-//    console.log(angle+" :")
-//    while (n.next){
+//    var visitedLocations=new Locations();
 //
-//        console.log(n.angle)
-//        n= n.next;
+//    depth = depth || 30;
+//
+//    var head = new Node(null, x, y, angle);
+//
+//
+//    return recursiveStep(head);
+//
+//
+//    function recursiveStep(node, n) {
+//
+//        n = n || 0;
+//
+//
+//        if (n == depth) {
+//            return head.next;
+//        }
+//        else if (!node) {
+//            return head.next;
+//        }
+//
+//        else if (!node.left && !node.right && !node.straight) {
+//            if (node.root)
+//                return head.next;
+//
+//            return recursiveStep(node.prev, n - 1);
+//        }
+//
+//        var h = heuristic(node);
+//
+//        for (var i = 0; i < h.length; i++) {
+//            var dir = h[i];
+//
+//            if (node[dir]) {
+//                var further = (eval(dir))(node);
+//
+//                if (further !== null) {
+//                    var next = getPositionRelativeToAngle(node.x, node.y, range, node.angle + further);
+//                    if (!visitedLocations.isPossible(next.x,next.y))
+//                        continue;
+//                    else if(!visitedLocations.contains(next.x,next.y))
+//                        visitedLocations.add(new Location(next.x,next.y));
+//
+//                    node.next = new Node(node, next.x, next.y, node.angle + further);
+//                    node[dir] = false;
+//                    node.next.prev = node;
+//
+//                    return  recursiveStep(node.next, n + 1);
+//                }
+//            }
+//        }
+//
+//
+//        function straight(n) {
+//            return nextAngle(n.x, n.y, n.angle, 0);
+//        }
+//
+//        function right(n) {
+//            return nextAngle(n.x, n.y, n.angle, 8);
+//        }
+//
+//        function left(n) {
+//            return nextAngle(n.x, n.y, n.angle, -8);
+//        }
+//
+//        function nextAngle(x, y, angle, offset) {
+//            var free = isFree(x, y, range, angle + offset, imgData, playersWidth);
+//            if (free) {
+//                return offset;
+//            }
+//            return null;
+//        }
+//
+//        visitedLocations.get(node.x,node.y).possible=false;
+//        return  recursiveStep(node.prev, n-1);
+//
+//
 //    }
 
-    return head.next;
+
+//    var counter=0;
+//
+//    while (allOverCounter < depth&&counter<50000) {
+//        counter++;
+//        var next;
+//
+//        console.log(allOverCounter,currentPoint.straight,currentPoint.left,currentPoint.right);
+//
+//        var free = isFree(currentPoint.x, currentPoint.y, range, currentPoint.angle, imgData, playersWidth);
+//
+//
+//        if (free && currentPoint.straight) {
+//            next = getPositionRelativeToAngle(currentPoint.x, currentPoint.y, range, currentPoint.angle);
+//            currentPoint.next = new Node(currentPoint, next.x, next.y, currentPoint.angle);
+//            currentPoint.straight = false;
+//            currentPoint = currentPoint.next;
+//
+//            allOverCounter++;
+//            continue;
+//        }
+//
+//        free = isFree(currentPoint.x, currentPoint.y, range, currentPoint.angle + 8, imgData, playersWidth);
+//        if (free && currentPoint.right) {
+//
+//            next = getPositionRelativeToAngle(currentPoint.x, currentPoint.y, range, currentPoint.angle + 8);
+//            currentPoint.next = new Node(currentPoint, next.x, next.y, currentPoint.angle + 8);
+//            currentPoint.right = false;
+//            currentPoint = currentPoint.next;
+//
+//            allOverCounter++;
+//            continue;
+//
+//        }
+//
+//        free = isFree(currentPoint.x, currentPoint.y, range, currentPoint.angle - 8, imgData, playersWidth);
+//        if (free && currentPoint.left) {
+//
+//            next = getPositionRelativeToAngle(currentPoint.x, currentPoint.y, range, currentPoint.angle - 8);
+//            currentPoint.next = new Node(currentPoint, next.x, next.y, currentPoint.angle - 8);
+//            currentPoint.left = false;
+//            allOverCounter++;
+//            currentPoint = currentPoint.next;
+//            continue;
+//
+//        }
+//        if (currentPoint.root)
+//            return null;
+//
+//        allOverCounter--;
+//        currentPoint = currentPoint.prev;
+//
+//
+//    }
+//
+//
+////    var n = head;
+//
+////    console.log(angle+" :")
+////    while (n.next){
+////
+////        console.log(n.angle)
+////        n= n.next;
+////    }
+//
+//    return head.next;
 
 }
 
