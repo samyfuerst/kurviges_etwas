@@ -1,10 +1,9 @@
 
+BUGS:
+- Wenn dünn, dann kann man durchfahren
 
-KI f�r Singleplayer
-
-tauschen manchmal immer nur noch 2 von 3
-
-
-
-items einstell-m�glichkeiten welche f�r das n�chste spiel gelten
+TODO:
+- KI für Singleplayer
+- tauschen manchmal immer nur noch 2 von 3
+- items einstell-möglichkeiten welche für das nächste spiel gelten
 
